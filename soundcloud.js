@@ -14,9 +14,9 @@ $(function(){
       $.ajax(userUrl, {
         success: function(response)
         {
+          if(response === )
           var location = response.city + ", " + response.country
           getLocation(location);
-          console.log(location);
         },
       });
     });
