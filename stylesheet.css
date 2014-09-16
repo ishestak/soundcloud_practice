@@ -1,5 +1,14 @@
-#map-canvas {
+html, body, #map-canvas {
+  position: relative;
+  z-index: 1;
   height: 100%;
   margin: 0px;
   padding: 0px;
+}
+
+body form#searchinggg {
+  margin-top: 2%;
+  margin-left: 6%;
+  position: absolute;
+  z-index: 3;
 }

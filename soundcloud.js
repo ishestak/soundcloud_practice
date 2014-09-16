@@ -14,13 +14,22 @@ $(function(){
       $.ajax(userUrl, {
         success: function(response)
         {
-          if(response === )
           var location = response.city + ", " + response.country
           getLocation(location);
-        },
+          $("#query").val("");
+        }, error: function(response){
+          alert("This artist does not exist.")
+          $("#query").val("");
+        }
       });
     });
 });
+
+function playSong(artist) {
+  SC.stream("/tracks/", function(sound){
+    sound.play();
+  });
+}
 
 function getLocation(location) {
   var locUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address='+location+'&key=AIzaSyBYy-_E0FhtiolGMX9OO3WFWxQlPBk6Dfo';
