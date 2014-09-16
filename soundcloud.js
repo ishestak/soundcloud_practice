@@ -1,42 +1,51 @@
-// $(function(){
-//
-//   SC.initialize({
-//     client_id: 'e1029c2d9a2079539d53193fe4cf5d69'
-//   });
-//
-//   var player = document.getElementById('player');
-//
-//     $('form').on('submit', function(event){
-//       event.preventDefault();
-//       var query = $("#query").val();
-//
-//       var userUrl = 'http://api.soundcloud.com/users/'+query+'.json?client_id=e1029c2d9a2079539d53193fe4cf5d69';
-//       $.ajax(userUrl, {
-//         success: function(response)
-//         {
-//           var location = response.city + ", " + response.country
-//           getLocation(location);
-//         },
-//       });
-//     });
-// });
-//
-// function getLocation(location) {
-//   console.log("Get Location");
-//   var locUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address='+location+'&key=AIzaSyBYy-_E0FhtiolGMX9OO3WFWxQlPBk6Dfo';
-//   $.ajax(locUrl, {
-//     success: function(returns)
-//     {
-//       var bounds = returns.results[0].geometry.bounds
-//       var south = new google.maps.LatLng(bounds.southwest.lat, bounds.southwest.lng);
-//       var north = new google.maps.LatLng(bounds.northeast.lat, bounds.northeast.lng);
-//       var artistLocation = new google.maps.LatLngBounds(north, south);
-//       // googleApi(artistLocation);
-//     }
-//   });
-// }
+$(function(){
+
+  SC.initialize({
+    client_id: 'e1029c2d9a2079539d53193fe4cf5d69'
+  });
+
+  var player = document.getElementById('player');
+
+    $('form').on('submit', function(event){
+      event.preventDefault();
+      var query = $("#query").val();
+
+      var userUrl = 'http://api.soundcloud.com/users/'+query+'.json?client_id=e1029c2d9a2079539d53193fe4cf5d69';
+      $.ajax(userUrl, {
+        success: function(response)
+        {
+          var location = response.city + ", " + response.country
+          getLocation(location);
+          $("#query").val("");
+        }, error: function(response){
+          alert("This artist does not exist.")
+          $("#query").val("");
+        }
+      });
+    });
+});
+
+function playSong(artist) {
+  SC.stream("/tracks/", function(sound){
+    sound.play();
+  });
+}
+
+function getLocation(location) {
+  var locUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address='+location+'&key=AIzaSyBYy-_E0FhtiolGMX9OO3WFWxQlPBk6Dfo';
+  $.ajax(locUrl, {
+    success: function(returns)
+    {
+      var centre = returns.results[0].geometry.location
+      var artistLocation = new google.maps.LatLng(centre.lat, centre.lng);
+      showArtist(artistLocation);
+    }
+  });
+}
 
 var map;
+var marker;
+
 function initialize() {
   console.log("Initialize");
   var mapOptions = {
@@ -49,32 +58,29 @@ function initialize() {
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
-// function googleApi(artistLocation) {
-//   function initialize() {
-//     console.log("initialize");
-//     var mapOptions = {
-//       zoom: 8,
-//       center: artistLocation
-//     };
-//     map = new google.maps.Map(document.getElementById('map-canvas'),
-//   mapOptions);
-//
-//     var marker = new google.maps.Marker({
-//       map: map,
-//       animation: google.maps.Animation.DROP,
-//       position: artistLocation
-//     });
-//     google.maps.event.addListener(marker, 'click', toggleBounce)
-//   }
-//   function toggleBounce() {
-//     if (marker.getAnimation() != null) {
-//       marker.setAnimation(null);
-//     } else {
-//       marker.setAnimation(google.maps.Animation.BOUNCE);
-//     }
-//   }
-//   google.maps.event.addDomListener(window, 'load', initialize);
-// }
+function showArtist(location)
+{
+  map.setCenter(location, 8);
+  dropMarker(location);
+}
+
+function dropMarker(location) {
+  marker = new google.maps.Marker(
+  {
+    map:map,
+    animation:google.maps.Animation.DROP,
+    position: location
+  });
+  google.maps.event.addListener(marker, 'click', toggleBounce())
+}
+
+function toggleBounce() {
+  if (marker.getAnimation() != null) {
+    marker.setAnimation(null);
+  } else {
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+  }
+}
 
 // function query(query, callback)
 // {
